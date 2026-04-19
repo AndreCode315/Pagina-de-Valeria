@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<script> // 1. Tu URL (La que vimos antes)
-  const supabaseUrl = 'https://qsvxegrlzpmgavhmxkrf.supabase.co'
-  
-  // 2. Tu Llave (La que acabas de encontrar)
-  const supabaseKey = 'sb_publishable_tfPOnep91PZD2xKd9QPeXw_3X-9VU3S'
-  </script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,9 +122,54 @@
     </div>
 
     <footer id="contacto">
-        <p>&copy; 2026 AI Automate - Soluciones Inteligentes</p>
-        <p>Contacto: info@aiautomate.example</p>
-    </footer>
+    <div class="container" style="background: #1a1a2e; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h2 style="color: white;">Regístrate para una demo</h2>
+        <form id="registroForm">
+            <input type="text" id="nombre" placeholder="Tu nombre" required style="padding: 10px; margin: 5px; border-radius: 5px; border: none; width: 80%; max-width: 300px;">
+            <input type="email" id="email" placeholder="Tu correo" required style="padding: 10px; margin: 5px; border-radius: 5px; border: none; width: 80%; max-width: 300px;">
+            <br>
+            <button type="submit" class="btn" style="cursor: pointer; border: none;">Enviar a la Base de Datos</button>
+        </form>
+        <p id="mensajeEstado" style="color: #e94560; margin-top: 10px; font-weight: bold;"></p>
+    </div>
+    <p>&copy; 2026 AI Automate - Soluciones Inteligentes</p>
+    <p>Contacto: info@aiautomate.example</p>
+</footer>
+
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // Tus credenciales
+    const supabaseUrl = 'https://qsvxegrlzpmgavhmxkrf.supabase.co'
+    const supabaseKey = 'sb_publishable_tfPOnep91PZD2xKd9QPeXw_3X-9VU3S'
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const form = document.getElementById('registroForm');
+    const mensaje = document.getElementById('mensajeEstado');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita que la página se recargue
+        mensaje.innerText = "Procesando...";
+
+        const nombre = document.getElementById('nombre').value;
+        const email = document.getElementById('email').value;
+
+        // Enviamos los datos a la tabla 'usuarios' en Postgres
+        const { data, error } = await supabase
+            .from('usuarios')
+            .insert([{ nombre: nombre, email: email }])
+
+        if (error) {
+            console.error("Error de Supabase:", error);
+            mensaje.innerText = "Error: " + error.message;
+            mensaje.style.color = "orange";
+        } else {
+            mensaje.innerText = "¡Listo! Datos guardados en PostgreSQL.";
+            mensaje.style.color = "#4CAF50"; // Verde éxito
+            form.reset(); // Limpia el formulario
+        }
+    });
+</script>
 
 </body>
 </html>
